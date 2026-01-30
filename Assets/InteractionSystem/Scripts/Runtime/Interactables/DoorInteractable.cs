@@ -5,13 +5,29 @@ using InteractionSystem.Inventory;
 namespace InteractionSystem.Interactables
 {
     /// <summary>
-    /// Toggleable door interactable that can optionally require a key item.
+    /// Interactable door that can be opened either by direct interaction
+    /// (optionally requiring a key) or by an external trigger such as a switch.
     /// </summary>
     public class DoorInteractable : MonoBehaviour, IInteractable
     {
+        #region Enums
+        /// <summary>
+        /// Defines how the door can be opened.
+        /// </summary>
+        public enum DoorOpenMode
+        {
+            DirectInteraction,
+            ExternalTrigger
+        }
+        #endregion
+
         #region Private Fields
         [SerializeField]
-        [Tooltip("Optional key required to open this door. If null, door is unlocked.")]
+        [Tooltip("Defines how this door is opened.")]
+        private DoorOpenMode m_OpenMode = DoorOpenMode.DirectInteraction;
+
+        [SerializeField]
+        [Tooltip("Optional key required to open this door when using direct interaction.")]
         private ItemDefinition m_RequiredKey;
 
         [SerializeField]
@@ -19,7 +35,7 @@ namespace InteractionSystem.Interactables
         private float m_MaxInteractionRange = 2.0f;
 
         [SerializeField]
-        [Tooltip("Optional interaction point for UI and distance checks.")]
+        [Tooltip("Optional interaction point.")]
         private Transform m_InteractionPoint;
 
         [SerializeField]
@@ -30,10 +46,23 @@ namespace InteractionSystem.Interactables
         private Quaternion m_ClosedRotation;
         #endregion
 
+        #region Public Properties
+        /// <summary>
+        /// Indicates whether the door is currently open.
+        /// </summary>
+        public bool IsOpen => m_IsOpen;
+        #endregion
+
         #region IInteractable Properties
+        /// <summary>
+        /// Transform used as the interaction point.
+        /// </summary>
         public Transform InteractionPoint =>
             m_InteractionPoint != null ? m_InteractionPoint : transform;
 
+        /// <summary>
+        /// Maximum interaction range.
+        /// </summary>
         public float MaxInteractionRange => m_MaxInteractionRange;
         #endregion
 
@@ -45,9 +74,17 @@ namespace InteractionSystem.Interactables
         #endregion
 
         #region IInteractable Methods
+        /// <summary>
+        /// Determines whether the door can be interacted with directly.
+        /// </summary>
         public bool CanInteract(in InteractionContext context, out string failReason)
         {
-            // If door is locked, check inventory
+            if (m_OpenMode == DoorOpenMode.ExternalTrigger)
+            {
+                failReason = "Use the switch";
+                return false;
+            }
+
             if (m_RequiredKey != null && !m_IsOpen)
             {
                 if (!context.InteractorTransform.TryGetComponent(out PlayerInventory inventory) ||
@@ -62,35 +99,63 @@ namespace InteractionSystem.Interactables
             return true;
         }
 
+        /// <summary>
+        /// Returns the interaction prompt for the door.
+        /// </summary>
         public string GetInteractionPrompt(in InteractionContext context)
         {
-            return m_IsOpen ? "Press E to Close" : "Press E to Open";
+            if (m_OpenMode == DoorOpenMode.ExternalTrigger)
+            {
+                return string.Empty;
+            }
+
+            return m_IsOpen
+                ? "Press E to Close"
+                : "Press E to Open";
         }
 
+        /// <summary>
+        /// Toggles the door when directly interacted with.
+        /// </summary>
         public void BeginInteraction(in InteractionContext context)
         {
             ToggleDoor();
         }
 
-        public void UpdateInteraction(in InteractionContext context)
-        {
-            // Toggle interaction – nothing to update per frame
-        }
+        /// <summary>
+        /// Toggle interaction does not require per-frame updates.
+        /// </summary>
+        public void UpdateInteraction(in InteractionContext context) { }
 
-        public void EndInteraction(in InteractionContext context)
+        /// <summary>
+        /// No cleanup required for toggle interaction.
+        /// </summary>
+        public void EndInteraction(in InteractionContext context) { }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// Sets the door open state externally (e.g., from a switch).
+        /// </summary>
+        public void SetOpenState(bool isOpen)
         {
-            // No cleanup required
+            if (m_IsOpen == isOpen)
+            {
+                return;
+            }
+
+            m_IsOpen = isOpen;
+
+            transform.localRotation = m_IsOpen
+                ? Quaternion.Euler(m_OpenRotationEuler)
+                : m_ClosedRotation;
         }
         #endregion
 
         #region Private Methods
         private void ToggleDoor()
         {
-            m_IsOpen = !m_IsOpen;
-
-            transform.localRotation = m_IsOpen
-                ? Quaternion.Euler(m_OpenRotationEuler)
-                : m_ClosedRotation;
+            SetOpenState(!m_IsOpen);
         }
         #endregion
     }
