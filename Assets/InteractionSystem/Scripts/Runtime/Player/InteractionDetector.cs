@@ -73,6 +73,8 @@ namespace InteractionSystem.Player
                     continue;
                 }
 
+                Debug.Log($"[Detector:{gameObject.name}] Collider '{interactable.ToString()}' has IInteractable (same object or parent).");
+
                 Transform interactionPoint = interactable.InteractionPoint != null
                     ? interactable.InteractionPoint
                     : hitCollider.transform;
