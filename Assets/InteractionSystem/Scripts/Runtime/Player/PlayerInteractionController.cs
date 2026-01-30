@@ -1,5 +1,8 @@
 using UnityEngine;
 using InteractionSystem.Core;
+using InteractionSystem.UI;
+using System;
+using InteractionSystem.Interactables;
 
 namespace InteractionSystem.Player
 {
@@ -15,6 +18,10 @@ namespace InteractionSystem.Player
         [Tooltip("Key used to trigger interactions.")]
         private KeyCode m_InteractionKey = KeyCode.E;
 
+        [SerializeField]
+        [Tooltip("Optional interaction UI controller for feedback messages.")]
+        private InteractionUIController m_InteractionUI;
+
         private InteractionDetector m_InteractionDetector;
 
         private IInteractable m_ActiveInteractable;
@@ -28,6 +35,11 @@ namespace InteractionSystem.Player
         private void Awake()
         {
             m_InteractionDetector = GetComponent<InteractionDetector>();
+
+            if (m_InteractionUI == null)
+            {
+                TryGetComponent(out m_InteractionUI);
+            }
         }
 
         private void Update()
@@ -68,8 +80,16 @@ namespace InteractionSystem.Player
                 return;
             }
 
-            if (!m_LastDetectedInteractable.CanInteract(context, out _))
+            if (!m_LastDetectedInteractable.CanInteract(context, out string failReason))
             {
+                if (m_InteractionUI != null)
+                {
+                    m_InteractionUI.ShowFailMessage(failReason);
+                }
+                else
+                {
+                    throw new ArgumentNullException(nameof(m_InteractionUI));
+                }
                 return;
             }
 
@@ -88,6 +108,14 @@ namespace InteractionSystem.Player
             }
 
             m_ActiveInteractable.UpdateInteraction(context);
+
+            if (m_ActiveInteractable is ChestInteractable chest && m_InteractionUI != null)
+            {
+                float progress = Mathf.Clamp01(
+                    chest.CurrentHoldTime / chest.HoldDuration);
+
+                m_InteractionUI.UpdateHoldProgress(progress);
+            }
 
             if (context.WasReleasedThisFrame)
             {
