@@ -76,6 +76,8 @@ namespace InteractionSystem.Interactables
         #region IInteractable Methods
         /// <summary>
         /// Determines whether the door can be interacted with directly.
+        /// Blocks interaction if a required key is missing and the door is closed.
+        /// If it does not need key, and DoorOpenMode is not ExternalTrigger, it can be opened directly.
         /// </summary>
         public bool CanInteract(in InteractionContext context, out string failReason)
         {
@@ -90,7 +92,7 @@ namespace InteractionSystem.Interactables
                 if (!context.InteractorTransform.TryGetComponent(out PlayerInventory inventory) ||
                     !inventory.HasItem(m_RequiredKey))
                 {
-                    failReason = "Key Required";
+                    failReason = $"{m_RequiredKey.DisplayName} Required";
                     return false;
                 }
             }
@@ -125,12 +127,18 @@ namespace InteractionSystem.Interactables
         /// <summary>
         /// Toggle interaction does not require per-frame updates.
         /// </summary>
-        public void UpdateInteraction(in InteractionContext context) { }
+        public void UpdateInteraction(in InteractionContext context)
+        {
+            // Intentionally left empty.
+        }
 
         /// <summary>
         /// No cleanup required for toggle interaction.
         /// </summary>
-        public void EndInteraction(in InteractionContext context) { }
+        public void EndInteraction(in InteractionContext context)
+        {
+            // No cleanup required for toggle interaction.
+        }
         #endregion
 
         #region Public Methods

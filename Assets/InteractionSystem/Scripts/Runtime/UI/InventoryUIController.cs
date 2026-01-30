@@ -31,7 +31,7 @@ namespace InteractionSystem.UI
             RefreshUI();
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             if (m_PlayerInventory != null)
             {
@@ -43,8 +43,10 @@ namespace InteractionSystem.UI
         #region Private Methods
         private void RefreshUI()
         {
+            // Clear all slots
             for (int i = 0; i < m_ItemSlots.Length; i++)
             {
+                m_ItemSlots[i].sprite = null;
                 m_ItemSlots[i].enabled = false;
             }
 
@@ -57,8 +59,14 @@ namespace InteractionSystem.UI
 
             for (int i = 0; i < items.Count && i < m_ItemSlots.Length; i++)
             {
-                // For now, we simply enable the slot.
-                // Icon support can be added later.
+                ItemDefinition item = items[i];
+
+                if (item.Icon == null)
+                {
+                    continue;
+                }
+
+                m_ItemSlots[i].sprite = item.Icon;
                 m_ItemSlots[i].enabled = true;
             }
         }

@@ -1,8 +1,6 @@
 using UnityEngine;
 using InteractionSystem.Core;
 using InteractionSystem.UI;
-using System;
-using InteractionSystem.Interactables;
 
 namespace InteractionSystem.Player
 {
@@ -88,7 +86,9 @@ namespace InteractionSystem.Player
                 }
                 else
                 {
-                    throw new ArgumentNullException(nameof(m_InteractionUI));
+                    Debug.LogWarning(
+                        $"[{nameof(PlayerInteractionController)}] Interaction failed: {failReason}",
+                        this);
                 }
                 return;
             }
@@ -108,14 +108,6 @@ namespace InteractionSystem.Player
             }
 
             m_ActiveInteractable.UpdateInteraction(context);
-
-            if (m_ActiveInteractable is ChestInteractable chest && m_InteractionUI != null)
-            {
-                float progress = Mathf.Clamp01(
-                    chest.CurrentHoldTime / chest.HoldDuration);
-
-                m_InteractionUI.UpdateHoldProgress(progress);
-            }
 
             if (context.WasReleasedThisFrame)
             {

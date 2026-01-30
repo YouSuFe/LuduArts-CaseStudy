@@ -53,10 +53,23 @@ namespace InteractionSystem.Inventory
         /// <summary>
         /// Checks whether the inventory contains the given item.
         /// </summary>
+        /// <param name="item">Item definition to check for.</param>
+        /// <returns>
+        /// True if the item exists in the inventory; otherwise false.
+        /// </returns>
         public bool HasItem(ItemDefinition item)
         {
-            return item != null && m_ItemIds.Contains(item.ItemId);
+            if (item == null)
+            {
+                Debug.LogWarning(
+                    $"[{nameof(PlayerInventory)}] HasItem called with null item.",
+                    this);
+                return false;
+            }
+
+            return m_ItemIds.Contains(item.ItemId);
         }
+
         #endregion
     }
 }

@@ -63,7 +63,9 @@ namespace InteractionSystem.Core
         {
             if (interactorTransform == null)
             {
-                throw new ArgumentNullException(nameof(interactorTransform));
+                throw new ArgumentException(
+                    "Interactor transform cannot be null.",
+                    nameof(interactorTransform));
             }
 
             m_InteractorTransform = interactorTransform;

@@ -9,7 +9,6 @@ namespace InteractionSystem.Core
     /// </summary>
     public interface IInteractable
     {
-        #region Public Properties
         /// <summary>
         /// World-space point used for interaction checks and UI positioning.
         /// </summary>
@@ -19,9 +18,7 @@ namespace InteractionSystem.Core
         /// Maximum distance at which this object can be interacted with.
         /// </summary>
         float MaxInteractionRange { get; }
-        #endregion
 
-        #region Public Methods
         /// <summary>
         /// Determines whether interaction is currently allowed.
         /// </summary>
@@ -58,6 +55,5 @@ namespace InteractionSystem.Core
         /// </summary>
         /// <param name="context">Interaction context.</param>
         void EndInteraction(in InteractionContext context);
-        #endregion
     }
 }

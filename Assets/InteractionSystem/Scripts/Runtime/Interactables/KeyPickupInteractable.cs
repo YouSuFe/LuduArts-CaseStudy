@@ -14,7 +14,7 @@ namespace InteractionSystem.Interactables
         [Tooltip("Item definition added to the inventory when picked up.")]
         private ItemDefinition m_ItemDefinition;
 
-        [SerializeField]
+        [SerializeField, Range(0.1f, 10f)]
         [Tooltip("Maximum distance at which this key can be picked up.")]
         private float m_MaxInteractionRange = 2.0f;
 
@@ -46,7 +46,16 @@ namespace InteractionSystem.Interactables
         {
             if (!context.InteractorTransform.TryGetComponent(out PlayerInventory inventory))
             {
-                Debug.LogWarning("PlayerInventory not found on player.");
+                Debug.LogWarning(
+                    $"[{nameof(KeyPickupInteractable)}] PlayerInventory not found on interactor.",
+                    this); return;
+            }
+
+            if (m_ItemDefinition == null)
+            {
+                Debug.LogError(
+                    $"[{nameof(KeyPickupInteractable)}] ItemDefinition is not assigned.",
+                    this);
                 return;
             }
 
@@ -54,9 +63,14 @@ namespace InteractionSystem.Interactables
             gameObject.SetActive(false);
         }
 
-        public void UpdateInteraction(in InteractionContext context) { }
-
-        public void EndInteraction(in InteractionContext context) { }
+        public void UpdateInteraction(in InteractionContext context)
+        {
+            // Instant interaction does not require per-frame updates.
+        }
+        public void EndInteraction(in InteractionContext context)
+        {
+            // No cleanup required.
+        }
         #endregion
     }
 }

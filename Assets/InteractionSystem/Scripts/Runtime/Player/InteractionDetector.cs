@@ -53,6 +53,9 @@ namespace InteractionSystem.Player
         #endregion
 
         #region Private Methods
+        /// <summary>
+        /// Performs an overlap sphere check and selects the closest valid interactable.
+        /// </summary>
         private void DetectInteractables()
         {
             int hitCount = Physics.OverlapSphereNonAlloc(
@@ -72,8 +75,6 @@ namespace InteractionSystem.Player
                 {
                     continue;
                 }
-
-                Debug.Log($"[Detector:{gameObject.name}] Collider '{interactable.ToString()}' has IInteractable (same object or parent).");
 
                 Transform interactionPoint = interactable.InteractionPoint != null
                     ? interactable.InteractionPoint

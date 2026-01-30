@@ -70,12 +70,19 @@ namespace InteractionSystem.Interactables
         /// <summary>
         /// Toggle interaction does not require per-frame updates.
         /// </summary>
-        public void UpdateInteraction(in InteractionContext context) { }
+        public void UpdateInteraction(in InteractionContext context)
+        {
+            // Toggle interaction does not require per-frame updates.
+        }
 
         /// <summary>
         /// No cleanup required for toggle interaction.
         /// </summary>
-        public void EndInteraction(in InteractionContext context) { }
+        public void EndInteraction(in InteractionContext context)
+        {
+            // No cleanup required for toggle interaction.
+        }
+
         #endregion
 
         #region Private Methods
