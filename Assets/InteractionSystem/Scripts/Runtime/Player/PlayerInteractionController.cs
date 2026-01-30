@@ -62,7 +62,11 @@ namespace InteractionSystem.Player
 
             // Cache last detected interactable to avoid timing issues
             IInteractable detected = m_InteractionDetector.CurrentInteractable;
-            if (detected != null)
+            if (detected == null)
+            {
+                m_LastDetectedInteractable = null;
+            }
+            else
             {
                 m_LastDetectedInteractable = detected;
             }
