@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,9 +11,25 @@ namespace InteractionSystem.Inventory
     {
         #region Private Fields
         private readonly HashSet<string> m_ItemIds = new HashSet<string>();
+        private readonly List<ItemDefinition> m_Items = new List<ItemDefinition>();
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Invoked whenever the inventory content changes.
+        /// </summary>
+        public event Action OnInventoryChanged;
+        #endregion
+
+        #region Public Properties
+        /// <summary>
+        /// Returns a read-only list of items in the inventory.
+        /// </summary>
+        public IReadOnlyList<ItemDefinition> Items => m_Items;
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Adds an item to the inventory.
         /// </summary>
@@ -24,9 +41,14 @@ namespace InteractionSystem.Inventory
                 return;
             }
 
-            m_ItemIds.Add(item.ItemId);
-            Debug.Log($"Item added to inventory: {item.DisplayName}");
+            if (m_ItemIds.Add(item.ItemId))
+            {
+                m_Items.Add(item);
+                Debug.Log($"Item added to inventory: {item.DisplayName}");
+                OnInventoryChanged?.Invoke();
+            }
         }
+
 
         /// <summary>
         /// Checks whether the inventory contains the given item.
